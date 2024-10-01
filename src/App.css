@@ -1,0 +1,8 @@
+.logo {
+  height: 6em;
+}
+
+.custom-toast-container {
+  z-index: 9999999 !important;
+}
+

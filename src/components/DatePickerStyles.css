@@ -1,0 +1,140 @@
+/* Custom calendar container */
+.custom-calendar-container {
+  position: relative;
+  width: 100%; /* Full width container */
+}
+
+/* Input field styling */
+.calendar-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Calendar popup styling */
+.calendar-popup {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%; /* Full width for the popup */
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom styling for react-calendar */
+.react-calendar {
+  width: 100%; /* Make the calendar take full width */
+  max-width: 100%;
+  background: white;
+  border: 1px solid #004d40; /* Customize border color */
+  font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.125em;
+  border-radius: 4px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add shadow for better appearance */
+}
+
+/* Calendar tile styling */
+.custom-calendar .react-calendar__tile {
+  border-radius: 50%; /* Make each day a circle */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition for hover effects */
+}
+
+/* Hover effect for calendar tiles */
+.custom-calendar .react-calendar__tile:hover {
+  background-color: #e0e0e0; /* Hover background color */
+}
+
+/* Current date styling */
+.custom-calendar .react-calendar__tile--now {
+  background: #4caf50 !important; /* Highlight current date */
+  color: white !important;
+}
+
+/* Selected date styling */
+.custom-calendar .react-calendar__tile--active {
+  background: #4caf50 !important; /* Selected date background color */
+  color: white !important;
+}
+
+/* Unavailable date styling */
+.custom-calendar .unavailable-date {
+  background-color: #ffcccc !important;
+  color: #d32f2f !important;
+  pointer-events: none; /* Disable interaction */
+}
+
+/* Calendar header and navigation styling */
+.custom-calendar .react-calendar__navigation button {
+  color: white !important; /* Arrow switcher color */
+}
+
+.custom-calendar .react-calendar__navigation {
+  background-color: #004d40 !important; /* Calendar header background color */
+  color: white !important; /* Calendar header text color */
+}
+
+.custom-calendar .react-calendar__navigation button:disabled {
+  color: #ccc;
+}
+
+.custom-calendar .react-calendar__navigation__label {
+  color: white !important; /* Ensure label color is white */
+}
+
+.react-calendar__navigation:hover {
+  background-color: #004d40 !important;
+}
+
+.unavailable-date-red {
+  background-color: #f44336 !important; /* Red for more than 3 bookings */
+  color: white !important;
+}
+
+.unavailable-date-yellow {
+  background-color: #ffeb3b !important; /* Yellow for 1 to 3 bookings */
+  color: black !important;
+}
+
+
+/* new css */
+
+.calendar-input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.calendar-popup {
+  position: absolute;
+  z-index: 1000;
+  margin-top: 10px;
+}
+
+.custom-calendar-container {
+  position: relative;
+  display: inline-block;
+}
+
+.unavailable-date-red {
+  background-color: #ffcccc !important;
+  color: #ff0000;
+}
+
+.unavailable-date-yellow {
+  background-color: #fff5b1 !important;
+  color: yellow;
+}
+
+.custom-calendar {
+  border-radius: 8px;
+  overflow: hidden;
+}
