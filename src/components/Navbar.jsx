@@ -1,88 +1,69 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import hidcoLogo from "../assets/hidco-logo.png";
-import { HomeIcon, BookOpenIcon } from '@heroicons/react/24/outline';
-import {
-  Navbar,
-  Collapse,
-  Typography,
-  Button,
-  IconButton,
-} from "@material-tailwind/react";
-import {
-  Bars3Icon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline';
-import {
-  UserIcon,
-} from '@heroicons/react/24/solid';
+import { HomeIcon, BookOpenIcon, ShoppingCartIcon, UserIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/outline';
+import { Navbar, Collapse, Button, IconButton } from "@material-tailwind/react";
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+
+const useAuth = () => {
+  const token = localStorage.getItem("token");
+  return { token, isAuthenticated: !!token };
+};
 
 export function NavbarWithMegaMenu() {
-  const [openNav, setOpenNav] = React.useState(false);
-  const { user, logout } = useAuth();
+  const [openNav, setOpenNav] = useState(false);
+  const [user, setUser] = useState(null);
+  const [cartCount, setCartCount] = useState(0);
   const navigate = useNavigate();
-  const location = useLocation(); // Get the current pathname
+  const location = useLocation();
+  const { token } = useAuth();
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("token");
+    setUser(null);
     navigate('/login');
   };
 
-  React.useEffect(() => {
+  const fetchUserDetails = async () => {
+    if (!token) return;
+
+    try {
+      const response = await fetch('http://localhost:3000/api/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user data');
+      }
+      const data = await response.json();
+      setUser(data);
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+      setUser(null);
+    }
+  };
+
+  const getCartItemCount = () => {
+    const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+    setCartCount(cartItems.length);
+  };
+
+  useEffect(() => {
+    fetchUserDetails();
+    getCartItemCount();
+  }, [token]);
+
+  useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 960) {
         setOpenNav(false);
       }
     };
-
     window.addEventListener("resize", handleResize);
-
-    // Cleanup existing Google Translate elements and scripts
-    const cleanUpGoogleTranslate = () => {
-      const existingScript = document.getElementById("google-translate-script");
-      if (existingScript) {
-        existingScript.remove();
-      }
-
-      const existingTranslateElement = document.getElementById("google_translate_element");
-      if (existingTranslateElement) {
-        existingTranslateElement.innerHTML = '';
-      }
-    };
-
-    cleanUpGoogleTranslate();
-
-    // Load Google Translate script
-    const loadGoogleTranslateScript = () => {
-      const script = document.createElement("script");
-      script.type = "text/javascript";
-      script.id = "google-translate-script";
-      script.src = "https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-      document.body.appendChild(script);
-    };
-
-    // Initialize Google Translate
-    const googleTranslateElementInit = () => {
-      if (window.google && window.google.translate) {
-        new window.google.translate.TranslateElement({
-          pageLanguage: 'en', // Your default language
-          includedLanguages: 'bn', // Bengali language code
-          layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE
-        }, 'google_translate_element');
-      }
-    };
-
-    if (!window.googleTranslateElementInit) {
-      window.googleTranslateElementInit = googleTranslateElementInit;
-      loadGoogleTranslateScript();
-    } else {
-      googleTranslateElementInit();
-    }
-
     return () => {
       window.removeEventListener("resize", handleResize);
-      cleanUpGoogleTranslate();
     };
   }, []);
 
@@ -93,9 +74,7 @@ export function NavbarWithMegaMenu() {
           <img src={hidcoLogo} className="h-9" alt="Hidco logo" />
           <Link
             to="/"
-            className={`flex flex-col items-center p-2 transition-colors duration-300 ${
-              location.pathname === '/' ? 'text-green-600' : 'text-gray-800'
-            } hover:text-green-600`}
+            className={`flex flex-col items-center p-2 transition-colors duration-300 ${location.pathname === '/' ? 'text-green-600' : 'text-gray-800'} hover:text-green-600`}
           >
             <HomeIcon className="h-6 w-6 mb-1" />
             <span>Home</span>
@@ -103,9 +82,7 @@ export function NavbarWithMegaMenu() {
           {user && (
             <Link
               to="/booking"
-              className={`flex flex-col items-center p-2 transition-colors duration-300 ${
-                location.pathname === '/booking' ? 'text-green-600' : 'text-gray-800'
-              } hover:text-green-600`}
+              className={`flex flex-col items-center p-2 transition-colors duration-300 ${location.pathname === '/booking' ? 'text-green-600' : 'text-gray-800'} hover:text-green-600`}
             >
               <BookOpenIcon className="h-6 w-6 mb-1" />
               <span>Bookings</span>
@@ -129,12 +106,26 @@ export function NavbarWithMegaMenu() {
         <div className="hidden lg:flex items-center gap-2">
           {user ? (
             <div className="flex gap-2 items-center">
-              <Link to="/profile" className="bg-gray-300 rounded-full p-1">
-                <UserIcon className="h-6 w-6 text-green-700" />
+              <Link to="/profile">
+                <Button variant="text" size="sm" color="blue-gray" className="flex items-center gap-1">
+                  <UserIcon className="h-6 w-6" /> Profile
+                </Button>
               </Link>
-              <Link className="bg-red-500 hover:bg-red-600 flex justify-center items-center rounded-md text-white px-3 py-1 font-semibold" onClick={handleLogout}>
-                Logout
+              <Link to="/cart">
+                <Button variant="text" size="sm" color="blue-gray" className="flex items-center gap-1">
+                  <ShoppingCartIcon className="h-6 w-6" /> Cart
+                  {cartCount > 0 && <span className="text-green-700">({cartCount})</span>}
+                </Button>
               </Link>
+              <Button
+                variant="text"
+                size="sm"
+                color="blue-gray"
+                onClick={handleLogout}
+                className="flex items-center gap-1"
+              >
+                <ArrowRightOnRectangleIcon className="h-6 w-6" /> Logout
+              </Button>
             </div>
           ) : (
             <>
@@ -160,14 +151,18 @@ export function NavbarWithMegaMenu() {
                 <UserIcon className="h-6 w-6 text-green-700 mr-2" />
                 Profile
               </Link>
+              <Link to="/cart" className="flex items-center px-4 py-2 hover:bg-gray-200">
+                <ShoppingCartIcon className="h-6 w-6 text-green-700 mr-2" />
+                Cart  {cartCount > 0 && <span className="text-green-700">({cartCount})</span>}
+              </Link>
               <Button
                 variant="text"
                 size="sm"
                 color="red"
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-2 hover:bg-gray-200"
+                className="flex items-center px-4 py-2 w-full text-left hover:bg-gray-200"
               >
-                Logout
+                <ArrowRightOnRectangleIcon className="h-6 w-6 text-green-700 mr-2" /> Logout
               </Button>
             </>
           ) : (

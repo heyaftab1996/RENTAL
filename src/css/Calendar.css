@@ -1,0 +1,98 @@
+.calendar-header {
+    margin-bottom: 10px; /* Space between header and calendar */
+  }
+  
+  .add-to-cart-button {
+    margin-left: 100px; 
+    /* Space between Add to Cart and Cancel buttons */
+    padding: 5px 10px;
+    background-color: rgb(0, 11, 128);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  
+  .add-to-cart-button:hover {
+    background-color: darkgreen;
+  }
+  .go-to-cart-button {
+    margin-left: 5px; 
+    margin-right: 5px;
+    /* Space between Add to Cart and Cancel buttons */
+    padding: 5px 10px;
+    background-color: rgb(0, 128, 30);
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  
+  .go-to-cart-button:hover {
+    background-color: darkgreen;
+  }
+  
+  .cancel-button {
+    padding: 5px 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  
+  .cancel-button:hover {
+    background-color: darkred;
+  }
+  
+  .react-calendar__tile--now{
+    background-color: darkblue !important; /* Deep blue for current date */
+    color: white; /* White text for better visibility */
+}
+
+
+/* Style for confirmed bookings */
+.confirmed-date {
+    background-color: red; /* Red for confirmed bookings */
+    color: white; /* White text for better visibility */
+}
+
+/* Style for unconfirmed bookings */
+.unconfirmed-date {
+    background-color: yellow; /* Yellow for unconfirmed bookings */
+    color: black; /* Black text for better visibility */
+}
+
+/* Style for past dates */
+.disabled-date {
+    background-color: lightgray; /* Gray for past dates */
+    color: white; /* White text for better visibility */
+}
+
+/* Additional styles (if needed) */
+.booking-calendar {
+    /* Add any additional styles for the calendar container here */
+}
+
+.calendar-header {
+    /* Style for the calendar header containing buttons */
+    margin-bottom: 10px; /* Add some space below the header */
+}
+
+.calendar-footer {
+    /* Style for the calendar footer showing selected dates */
+    margin-top: 10px; /* Add some space above the footer */
+}
+
+.selected-date {
+  background-color: rgba(255, 255, 0, 0.5); /* Semi-transparent yellow for selected range */
+  color: black;
+}
+
+/* Optional: You might want to add hover effects */
+.selected-date:hover,
+.unconfirmed-date:hover,
+.confirmed-date:hover,
+.current-date:hover {
+  opacity: 0.8;
+}

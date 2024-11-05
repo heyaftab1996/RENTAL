@@ -20,6 +20,8 @@ import RedirectIfAuthenticated from './components/RedirectIfAuthenticated.jsx';
 import Dda from './pages/Dda.jsx';
 import UserProfile from './pages/UserProfile.jsx';
 import Booking from './pages/booking.jsx';
+import Cart from './pages/cart.jsx';
+import PropertyDetails from './pages/PropertyDetails.jsx';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NazrulTirtha from './pages/NazrulTirtha.jsx';
@@ -47,17 +49,22 @@ const router = createBrowserRouter(
       <Route
         path="/bbcc/book-now"
         element={
-          <ProtectedRoute>
-            <Bbcc />
-          </ProtectedRoute>
+          <Bbcc />
+          // <ProtectedRoute>
+          //   <Bbcc />
+          // </ProtectedRoute>
         }
+      />
+       <Route
+        path="/property/:propertyId" // New Route without ProtectedRoute
+        element={<PropertyDetails />}
       />
       <Route
         path="/dhono-dhono/book-now"
         element={
-          <ProtectedRoute>
+         
             <Dda />
-          </ProtectedRoute>
+        
         }
       />
       <Route
@@ -98,6 +105,14 @@ const router = createBrowserRouter(
           <RedirectIfAuthenticated>
             <SignUp />
           </RedirectIfAuthenticated>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <Cart />
+          </ProtectedRoute>
         }
       />
     </>

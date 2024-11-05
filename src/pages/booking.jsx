@@ -1,27 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
-import { NavbarWithMegaMenu } from '../components/Navbar';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Container, Typography, Card, CardContent, Grid, Box, Button, Divider ,CardHeader} from '@mui/material';
+import { Container, Typography, List, ListItem, ListItemText, ListItemSecondaryAction, Button, Card, CardContent, Box } from '@mui/material';
+import { NavbarWithMegaMenu } from '../components/Navbar';
 
 const BookingsPage = () => {
-    const { user } = useAuth();
     const [bookings, setBookings] = useState([]);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
 
     useEffect(() => {
-        if (user && user.id) {
-            fetchUserBookings();
-        }
-    }, [user]);
+        verifyUserAuthentication();
+    }, []);
 
-    const fetchUserBookings = async () => {
+    const verifyUserAuthentication = async () => {
         try {
-            const response = await axios.post('http://localhost:8000/api/user-bookings', { user_id: user.id });
-            if (Array.isArray(response.data)) {
-                setBookings(response.data);
-                console.log(response.data);
+            const token = localStorage.getItem("token");
+            if (!token) {
+                toast.error("No token found. Please log in.");
+                return;
+            }
+
+            const response = await axios.get('http://localhost:3000/api/me', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (response.data && response.data.user) {
+                setIsAuthenticated(true);
+                fetchUserBookings(response.data.user.id);
+            } else {
+                toast.error("User not authenticated.");
+            }
+        } catch (error) {
+            console.error("Error verifying authentication:", error);
+            toast.error("Authentication failed. Please log in.");
+        }
+    };
+
+    const fetchUserBookings = async (userId) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.get('http://localhost:3000/api/viewUserBookings', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                params: { user_id: userId }
+            });
+
+            if (response.data && Array.isArray(response.data.bookings)) {
+                setBookings(response.data.bookings);
             } else {
                 console.error("Unexpected response format for user bookings:", response.data);
                 setBookings([]);
@@ -35,11 +64,15 @@ const BookingsPage = () => {
     const handleCancelBooking = async (bookingId) => {
         if (window.confirm('Are you sure you want to cancel this booking?')) {
             try {
-                const response = await axios.delete('http://localhost:8000/api/cancel-booking', {
+                const token = localStorage.getItem("token");
+                const response = await axios.delete('http://localhost:3000/api/cancel-booking', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    },
                     data: { booking_id: bookingId }
                 });
                 toast.success(response.data.message);
-                fetchUserBookings(); // Refresh the bookings list
+                fetchUserBookings();
             } catch (error) {
                 console.error("Error cancelling booking:", error);
             }
@@ -47,102 +80,88 @@ const BookingsPage = () => {
     };
 
     const handlePayNow = (bookingId) => {
-        // Handle payment logic here
         alert(`Proceeding to payment for booking ID: ${bookingId}`);
-    };
-
-    // Utility function to get ordinal suffix (e.g., 1st, 2nd, 3rd)
-    const getOrdinalSuffix = (num) => {
-        const suffix = ['th', 'st', 'nd', 'rd'],
-            v = num % 100;
-        return num + (suffix[(v - 20) % 10] || suffix[v] || suffix[0]);
     };
 
     return (
         <>
             <ToastContainer />
             <NavbarWithMegaMenu />
-            <Container maxWidth="md" sx={{ py: 8 }}>
-                {/* Display the User ID */}
-                {/* {user && user.user_id && (
-                    <Typography variant="h5" component="h2" gutterBottom align="center">
-                        User ID: {user.user_id}
-                    </Typography>
-                )} */}
-
-                <Typography variant="h3" component="h1" gutterBottom align="center">
+            <Container maxWidth="md" sx={{ py: 2 }}>
+                <Typography variant="h4" component="h1" gutterBottom align="center">
                     Your Bookings
                 </Typography>
 
-                {Array.isArray(bookings) && bookings.length > 0 ? (
-                    <Grid container spacing={3}>
+                {isAuthenticated && bookings.length > 0 ? (
+                    <List>
                         {bookings.map(booking => (
-                            <Grid item xs={12} sm={6} md={4} key={booking.ba_id}>
-                                <Card sx={{ borderRadius: 2, boxShadow: 3 }}>
-                                    {/* Move Booking ID to the CardHeader */}
-                                    <CardHeader
-                                        title={`Booking ID: ${booking.id}`}
-                                        titleTypographyProps={{ variant: 'h6', color: 'gray' }} // Styling the Booking ID
-                                        sx={{ backgroundColor: '#f5f5f5' }} // Optional: Adds a light grey background to the header
-                                    />
+                            <ListItem key={booking.id} sx={{ padding: 0, marginBottom: 2 }}>
+                                <Card 
+                                    variant="outlined" 
+                                    sx={{ 
+                                        width: '100%', 
+                                        boxShadow: 3, // Add box shadow
+                                        borderRadius: 2, // Rounded corners
+                                        padding: 2, // Padding inside the card
+                                        transition: '0.3s', // Transition effect
+                                        '&:hover': { // Hover effect
+                                            boxShadow: 6 
+                                        }
+                                    }}
+                                >
                                     <CardContent>
-                                        <Divider sx={{ mb: 2 }} />
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Property:</strong> {booking.property}
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Check-In:</strong> {booking.check_in_date}
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Check-Out:</strong> {booking.check_out_date}
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Total Days:</strong> {booking.no_of_days}
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Total Price:</strong> Rs. {booking.total_price} /-
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Holdon Payment Status:</strong> {booking.payment_status}
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Approval Status:</strong> {booking.status}
-                                        </Typography>
-                                        <Typography variant="body1" gutterBottom>
-                                            <strong>Queue Position:</strong> {booking.status} 
-                                        </Typography>
-
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-                                            {booking.status !== 'Cancelled' && (
+                                        <ListItemText
+                                            primary={`Booking ID: ${booking.booking_id}`}
+                                            secondary={
+                                                <>
+                                                    <Typography component="span"><strong>Property:</strong> {booking.rentalPlace.rental_place_name} ({booking.rentalPlace.property.rental_property_name})</Typography>
+                                                    <br />
+                                                    <Typography component="span"><strong>Date:</strong> {booking.booking_start_date} To {booking.booking_end_date}</Typography>
+                                                    <br />
+                                                    <Typography component="span"><strong>Total Price:</strong> Rs. {booking.total_price} /-</Typography>
+                                                    <br />
+                                                    <Typography component="span"><strong>Booking Status:</strong> {booking.booking_status}</Typography>
+                                                    <br />
+                                                    <Typography component="span"><strong>Payment Status:</strong> {booking.payment_status}</Typography>
+                                                    <br />
+                                                    <Typography component="span"><strong>Phone:</strong> {booking.user.phone_no}</Typography>
+                                                    <br />
+                                                    <Typography component="span"><strong>Amount Paid:</strong> Rs. {booking.amount}</Typography>
+                                                    <br />
+                                                    <Typography component="span"><strong>Due Amount:</strong> Rs. {booking.due_amount}</Typography>
+                                                </>
+                                            }
+                                        />
+                                        <ListItemSecondaryAction>
+                                            {!booking.is_cancelled && (
                                                 <Button
                                                     variant="outlined"
                                                     color="error"
-                                                    onClick={() => handleCancelBooking(booking.ba_id)}
+                                                    onClick={() => handleCancelBooking(booking.id)}
                                                 >
                                                     Cancel
                                                 </Button>
                                             )}
-                                            {booking.status === 'Accepted' && (
+                                            {booking.booking_status === 'Accepted' && (
                                                 <Button
                                                     variant="contained"
                                                     color="primary"
-                                                    onClick={() => handlePayNow(booking.ba_id)}
+                                                    onClick={() => handlePayNow(booking.id)}
                                                 >
                                                     Pay Now
                                                 </Button>
                                             )}
-                                        </Box>
+                                        </ListItemSecondaryAction>
                                     </CardContent>
                                 </Card>
-                            </Grid>
+                            </ListItem>
                         ))}
-                    </Grid>
+                    </List>
                 ) : (
                     <Typography variant="body1" align="center" sx={{ mt: 4 }}>
-                        No bookings found.
+                        {isAuthenticated ? "No bookings found." : "Please log in to view your bookings."}
                     </Typography>
                 )}
-
             </Container>
         </>
     );

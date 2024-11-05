@@ -1,12 +1,8 @@
-import React from "react";
+import React  ,{ useEffect, useState }  from "react";
 import Slider from "react-slick";
 import { Card, CardHeader, Typography } from "@material-tailwind/react";
-import bbcc from "../assets/bbcc.png";
-import happyworks from "../assets/happy-works.jpg";
-import dda from "../assets/dda.jpg";
-import smartconnect from "../assets/smart-connect.jpg";
-import ecourban from "../assets/eco-urban-village.jpg";
-import snehodiya from "../assets/snehodiya-cover.jpg";
+import axios from 'axios';
+
 import { Link } from "react-router-dom";
 
 function StarIcon() {
@@ -47,6 +43,18 @@ export function AudiCard() {
       },
     ],
   };
+  const [properties, setProperties] = useState([]);
+
+  useEffect(() => {
+    // Fetch data from the API
+    axios.get('http://localhost:3000/api/rental-property')
+      .then((response) => {
+        setProperties(response.data); // Set API response data
+      })
+      .catch((error) => {
+        console.error('Error fetching the featured rental properties:', error);
+      });
+  }, []);
 
   return (
     <div className="overflow-hidden mx-2">
@@ -54,199 +62,62 @@ export function AudiCard() {
             <h2 className='font-bold text-2xl py-2 mx-1 lg:mx-8'>All Rentals</h2>
         </div>
       <Slider className="mb-6 border-b-2" {...settings}>
+      {properties.map((property, index) => (
+
         <div className="px-1">
-          <Card color="transparent" shadow={false} className="w-full mx-auto">
-            <Link to={"smart-connect/book-now"}>
-              <CardHeader
-                color="transparent"
-                floated={false}
-                shadow={false}
-                className="mx-0 grid items-center gap-2 pb-1 "
-              >
-                <img
-                  src={smartconnect}
-                  className="h-24 lg:h-24 lg:w-36 w-full object-cover rounded-xl flex mx-auto"
-                  alt="snehodiya"
-                />
-                <div className="flex w-full flex-col gap-0.5">
-                  <div className="lg:ml-7">
-                    <Typography variant="h6" color="blue-gray" className="text-xs">
-                      Smart Connect
-                    </Typography>
-                    <div className="flex items-center gap-0">
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                    </div>
+        <Card color="transparent" shadow={false} className="w-full mx-auto">
+          <Link  to={`/property/${property.id}`}>
+            <CardHeader
+              color="transparent"
+              floated={false}
+              shadow={false}
+              className="mx-0 grid items-center gap-2 pb-1"
+            >
+              <div className="relative flex mx-auto w-full h-80 overflow-hidden rounded-xl">
+              <img
+          src={`http://localhost:3000/uploads/${
+            property.images && property.images.length > 0
+              ? property.images[0].file_name
+              : 'noimage.jpg'
+          }`}
+          className="object-cover w-full h-full transition-transform duration-500 transform hover:scale-110"
+          alt={property.rental_property_name || 'No Image'}
+        />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 transition-opacity duration-300 hover:opacity-100">
+                  <Link
+                   to={`/property/${property.id}`}
+                    className="bg-orange-red text-white px-4 py-2 rounded shadow-lg"
+                  >
+                    View
+                  </Link>
+                </div>
+              </div>
+              <div className="flex w-full flex-col gap-0.5">
+                <div className="lg:ml-7">
+                  <Typography
+                    variant="h6"
+                    color="blue-gray"
+                    className="text-xs"
+                  >
+                  {property.rental_property_name}
+                  </Typography>
+                  <div className="flex items-center gap-0">
+                    {/* <StarIcon />
+                    <StarIcon />
+                    <StarIcon />
+                    <StarIcon />
+                    <StarIcon /> */}
+                    {[...Array(parseInt(property.rating)).keys()].map((star) => (
+                      <StarIcon key={star} />
+                    ))}
                   </div>
                 </div>
-              </CardHeader>
-            </Link>
-          </Card>
+              </div>
+            </CardHeader>
+          </Link>
+        </Card>
         </div>
-        <div className="px-1">
-          <Card color="transparent" shadow={false} className="w-full mx-auto">
-            <Link to={"eco-urban-village/book-now"}>
-              <CardHeader
-                color="transparent"
-                floated={false}
-                shadow={false}
-                className="mx-0 grid items-center gap-2 pb-1 "
-              >
-                <img
-                  src={ecourban}
-                  className="h-24 lg:h-24 lg:w-36 w-full object-cover rounded-xl flex mx-auto"
-                  alt="snehodiya"
-                />
-                <div className="flex w-full flex-col gap-0.5">
-                  <div className="lg:ml-7">
-                    <Typography variant="h6" color="blue-gray" className="text-xs">
-                      Eco Urban Village
-                    </Typography>
-                    <div className="flex items-center gap-0">
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-            </Link>
-          </Card>
-        </div>
-        <div className="px-1">
-          <Card color="transparent" shadow={false} className="w-full mx-auto">
-            <Link to={"snehodiya/book-now"}>
-              <CardHeader
-                color="transparent"
-                floated={false}
-                shadow={false}
-                className="mx-0 grid items-center gap-2 pb-1 "
-              >
-                <img
-                  src={snehodiya}
-                  className="h-24 lg:h-24 lg:w-36 w-full object-cover rounded-xl flex mx-auto"
-                  alt="snehodiya"
-                />
-                <div className="flex w-full flex-col gap-0.5">
-                  <div className="lg:ml-7">
-                    <Typography variant="h6" color="blue-gray" className="text-xs">
-                      Snehodiya
-                    </Typography>
-                    <div className="flex items-center gap-0">
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-            </Link>
-          </Card>
-        </div>
-        <div className="px-1">
-          <Card color="transparent" shadow={false} className="w-full mx-auto">
-            <Link to={"bbcc/book-now"}>
-              <CardHeader
-                color="transparent"
-                floated={false}
-                shadow={false}
-                className="mx-0 grid items-center gap-3 pb-4"
-              >
-                <img
-                  src={bbcc}
-                  className="h-24 lg:h-24 lg:w-36 w-full object-cover rounded-xl flex mx-auto"
-                  alt="Hidco logo"
-                />
-                <div className="flex w-full flex-col gap-0.5">
-                  <div className="lg:ml-7">
-                    <Typography variant="h6" color="blue-gray" className="text-xs">
-                      BBCC
-                    </Typography>
-                    <div className="flex items-center gap-0">
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-            </Link>
-          </Card>
-        </div>
-        <div className="px-1">
-          <Card color="transparent" shadow={false} className="w-full mx-auto">
-            <Link to={"happy-works/book-now"}>
-              <CardHeader
-                color="transparent"
-                floated={false}
-                shadow={false}
-                className="mx-0 grid items-center gap-2 pb-1 "
-              >
-                <img
-                  src={happyworks}
-                  className="h-24 lg:h-24 lg:w-36 w-full object-cover rounded-xl flex mx-auto"
-                  alt="snehodiya"
-                />
-                <div className="flex w-full flex-col gap-0.5">
-                  <div className="lg:ml-7">
-                    <Typography variant="h6" color="blue-gray" className="text-xs">
-                      Happy Works
-                    </Typography>
-                    <div className="flex items-center gap-0">
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-            </Link>
-          </Card>
-        </div>
-        <div className="px-1">
-          <Card color="transparent" shadow={false} className="w-full mx-auto">
-            <Link to={"dhono-dhono/book-now"}>
-              <CardHeader
-                color="transparent"
-                floated={false}
-                shadow={false}
-                className="mx-0 grid items-center gap-2 pb-1 "
-              >
-                <img
-                  src={dda}
-                  className="h-24 lg:h-24 lg:w-36 w-full object-cover rounded-xl flex mx-auto"
-                  alt="snehodiya"
-                />
-                <div className="flex w-full flex-col gap-0.5">
-                  <div className="lg:ml-7">
-                    <Typography variant="h6" color="blue-gray" className="text-xs">
-                      Dhono Dhono Auditorium
-                    </Typography>
-                    <div className="flex items-center gap-0">
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                      <StarIcon />
-                    </div>
-                  </div>
-                </div>
-              </CardHeader>
-            </Link>
-          </Card>
-        </div>
-        {/* Add more cards as needed */}
+      ))}
       </Slider>
     </div>
   );

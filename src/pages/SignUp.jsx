@@ -1,91 +1,27 @@
-// import React, { useState } from 'react';
-// import { useAuth } from '../context/AuthContext';
-// import { useNavigate } from 'react-router-dom';
-// import { Button, TextField, Container, Typography, Box } from '@mui/material';
-// import * as EmailValidator from 'email-validator';
-// import { NavbarWithMegaMenu } from '../components/Navbar';
-
-// const SignUp = () => {
-//     const [email, setEmail] = useState('');
-//     const [password, setPassword] = useState('');
-//     const [error, setError] = useState('');
-//     const { signup } = useAuth();
-//     const navigate = useNavigate();
-
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
-//         if (!EmailValidator.validate(email)) {
-//             setError('Invalid email format');
-//             return;
-//         }
-//         if (password.length < 6) {
-//             setError('Password must be at least 6 characters long');
-//             return;
-//         }
-//         const success = await signup(email, password);
-//         if (success) {
-//             navigate('/');
-//         } else {
-//             setError('Signup failed');
-//         }
-//     };
-
-//     return (
-//         <>
-//         <NavbarWithMegaMenu />
-        
-//         <Container maxWidth="sm" className='pt-6'>
-//             <Typography className='text-center' variant="h4" component="h1" gutterBottom>
-//                 Sign Up
-//             </Typography>
-//             {error && <Typography color="error">{error}</Typography>}
-//             <form onSubmit={handleSubmit}>
-//                 <TextField
-//                     label="Email"
-//                     type="email"
-//                     fullWidth
-//                     margin="normal"
-//                     value={email}
-//                     onChange={(e) => setEmail(e.target.value)}
-//                     required
-//                 />
-//                 <TextField
-//                     label="Password"
-//                     type="password"
-//                     fullWidth
-//                     margin="normal"
-//                     value={password}
-//                     onChange={(e) => setPassword(e.target.value)}
-//                     required
-//                 />
-//                 <Box mt={2}>
-//                     <Button type="submit" variant="contained" color="primary" fullWidth>
-//                         Sign Up
-//                     </Button>
-//                 </Box>
-//             </form>
-//         </Container>
-//         </>
-//     );
-// };
-
-// export default SignUp;
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext'; // Import the useAuth hook
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Button, TextField, Container, Typography, Box, Link } from '@mui/material';
-import * as EmailValidator from 'email-validator'; // Import email validator
+import * as EmailValidator from 'email-validator';
 import hidcoLogo from '../assets/hidco-logo.png';
 
 const SignUp = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [phoneNo, setPhoneNo] = useState('');
     const [error, setError] = useState('');
-    const { signup } = useAuth(); // Destructure the signup function from useAuth
-    const navigate = useNavigate(); // Create a navigate function using useNavigate
+    const { signup } = useAuth();
+    const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Validate form fields
+        if (!name) {
+            setError('Name is required');
+            return;
+        }
         if (!EmailValidator.validate(email)) {
             setError('Invalid email format');
             return;
@@ -94,11 +30,39 @@ const SignUp = () => {
             setError('Password must be at least 6 characters long');
             return;
         }
-        const success = await signup(email, password);
-        if (success) {
-            navigate('/'); // Redirect to home page after successful signup
-        } else {
-            setError('Signup failed');
+        if (!phoneNo || phoneNo.length < 10) {
+            setError('Mobile number must be at least 10 digits long');
+            return;
+        }
+
+        // Prepare the registration data
+        const data = {
+            name,
+            email,
+            password,
+            phone_no: phoneNo,
+        };
+
+        try {
+            // Call the signup API with the required headers for JSON
+            const response = await fetch('http://localhost:3000/api/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Signup successful:', result);
+                navigate('/login'); // Redirect to home page after successful signup
+            } else {
+                const errorData = await response.json();
+                setError(errorData.message || 'Signup failed');
+            }
+        } catch (error) {
+            setError('Signup request failed');
         }
     };
 
@@ -119,7 +83,7 @@ const SignUp = () => {
                     padding: "1.5rem",
                     borderRadius: "8px",
                     boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                    width: '500px', // Adjusted width to make the box smaller
+                    width: '500px',
                 }}
             >
                 <center>
@@ -138,10 +102,18 @@ const SignUp = () => {
                 >
                     Create Your Account
                 </Typography>
-                
+
                 {error && <Typography color="error">{error}</Typography>}
-                
-                <form onSubmit={handleSubmit}> {/* Form submission logic added here */}
+
+                <form onSubmit={handleSubmit}>
+                    <TextField
+                        label="Name"
+                        fullWidth
+                        margin="normal"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        required
+                    />
                     <TextField
                         label="Email"
                         type="email"
@@ -160,7 +132,16 @@ const SignUp = () => {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                     />
-                    
+                    <TextField
+                        label="Mobile Number"
+                        type="tel"
+                        fullWidth
+                        margin="normal"
+                        value={phoneNo}
+                        onChange={(e) => setPhoneNo(e.target.value)}
+                        required
+                    />
+
                     <Box mt={2}>
                         <Button
                             type="submit"
@@ -178,7 +159,7 @@ const SignUp = () => {
                         </Button>
                     </Box>
                 </form>
-                
+
                 <Box mt={2} mb={2} textAlign="center">
                     <Typography variant="body2">
                         Already have an account?
@@ -193,4 +174,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-
