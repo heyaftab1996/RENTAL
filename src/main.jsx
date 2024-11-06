@@ -26,6 +26,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import NazrulTirtha from './pages/NazrulTirtha.jsx';
 
+import ContactUs from './pages/contact-us.jsx';
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
@@ -58,6 +59,10 @@ const router = createBrowserRouter(
        <Route
         path="/property/:propertyId" // New Route without ProtectedRoute
         element={<PropertyDetails />}
+      />
+      <Route
+        path="/contact-us" // New Route without ProtectedRoute
+        element={<ContactUs />}
       />
       <Route
         path="/dhono-dhono/book-now"
