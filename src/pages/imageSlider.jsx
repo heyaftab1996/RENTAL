@@ -84,7 +84,7 @@ const ImageSlider = ({ placeId }) => {
                 alt={`slide ${index}`}
                 sx={{
                   width: '100%',
-                  height: 400,
+                  height: 350,
                   objectFit: 'cover',
                   transition: 'transform 0.3s ease-in-out',
                   '&:hover': {

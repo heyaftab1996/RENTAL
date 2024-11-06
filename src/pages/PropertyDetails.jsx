@@ -92,7 +92,7 @@ const BookingPage = () => {
     <>
       <NavbarWithMegaMenu />
       <div className="p-5">
-        <Card className="grid grid-cols-1 justify-center pt-0 bg-white shadow-lg rounded-lg">
+        <div className="grid grid-cols-1 justify-center pt-0  rounded-lg">
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-5">
             {selectedPlace.id &&  (
@@ -116,7 +116,7 @@ const BookingPage = () => {
                   <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700" onClick={() => setMapModalOpen(true)}>
                     See on Map
                   </button>
-                    <Button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"  onClick={handleContactUsOpen}>
+                    <Button className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-green-700"  onClick={handleContactUsOpen}>
                       Contact Us
                   </Button>
                   <Button
@@ -216,8 +216,8 @@ const BookingPage = () => {
           </div>
         </Dialog>
               {/* Rental Place Selection */}
-              <div className="flex flex-col gap-4 mt-4">
-                <Select label="Select Rental Place" onChange={handlePlaceSelect}  value={selectedPlace ? selectedPlace.id : ""} >
+              <div className="flex flex-col gap-4 pt-5 pb-5 mt-4">
+                <Select label="Select Rental Place" onChange={handlePlaceSelect} style={{ backgroundColor: 'white' }}  value={selectedPlace ? selectedPlace.id : ""} >
                   {rentalPlaces.map((place) => (
                     <Option key={place.id} value={place.id}>
                       {place.rental_place_name} (Seating Capacity: {place.seating_capacity})
@@ -260,7 +260,7 @@ const BookingPage = () => {
               </div>
             </div>
           </div>
-        </Card>
+        </div>
 
         {/* Tabs for Reviews, About Us, and Security & Policy */}
         <Card className="mt-6 p-5 shadow-lg">
